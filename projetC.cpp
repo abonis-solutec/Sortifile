@@ -4,11 +4,11 @@
 #include <iostream>
 #include "stdlib.h"
 #include <filesystem>
+#include <fstream>
 #include <vector>
 #include <locale>
 #include <Windows.h>
-
-
+#include <nlohmann/json.hpp>
 
 // Exécuter le programme : Ctrl+F5 ou menu Déboguer > Exécuter sans débogage
 // Déboguer le programme : F5 ou menu Déboguer > Démarrer le débogage
@@ -30,19 +30,38 @@ void lister_fichiers_et_dossiers(const std::string& chemin) {
         return;
     }
 
+    std::ofstream fichier("resulat.json");
+    fichier << "[" << std::endl;
+    bool premier = true;
+
     // Parcourir le répertoire
     std::cout << "\nContenu du répertoire \"" << chemin << "\":" << std::endl;
 
     for (const auto& entry : fs::directory_iterator(chemin)) {
+        nlohmann::json element; // JSON pour chaque élément
+        element["nom"] = entry.path().filename().string();
+
         if (fs::is_regular_file(entry)) {
+            element["type"] = "Fichier";
+            element["taille"] = fs::file_size(entry);
             // Afficher le fichier
             std::cout << "[Fichier] " << entry.path().filename().string() << std::endl;
         }
         else if (fs::is_directory(entry)) {
             // Afficher le dossier
+            element["type"] = "Dossier";
             std::cout << "[Dossier] " << entry.path().filename().string() << std::endl;
         }
+
+        if (!premier) {
+            fichier << "," << std::endl;
+        }
+        premier = false;
+        fichier << "  " << element.dump(4);
     }
+
+    fichier << std::endl << "]" << std::endl;
+    fichier.close();
 }
 
 int main() {
