@@ -108,7 +108,10 @@ void lister_fichiers_et_dossiers(const std::string& chemin) {
         return;
     }
 
-    std::ofstream fichier("resulat.json");
+    //std::ofstream fichier("C:/Users/ngiroud0/Documents/resultat.json");
+    
+    std::ofstream fichier;
+    fichier.open("C:/Users/ngiroud0/Documents/GitHub/resultat.json", ios_base::out | ios_base::binary);
     fichier << "[" << std::endl;
     bool premier = true;
 
